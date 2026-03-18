@@ -1,11 +1,11 @@
-use crate::{config::*, render::Texturable};
+use crate::{config::*, render::Texturable, rules};
 use macroquad::{
     color::WHITE,
     math::vec2,
     texture::{DrawTextureParams, Texture2D, draw_texture_ex},
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Material {
     Air,
     Sand,
@@ -19,7 +19,7 @@ pub enum Material {
 #[derive(Clone, Copy)]
 pub struct Cell {
     pub material: Material,
-    pub updated: u8,
+    pub updated: bool,
     pub lifetime: u8,
 }
 
@@ -34,7 +34,7 @@ impl Grid {
         let cells = vec![
             Cell {
                 material: Material::Air,
-                updated: 0,
+                updated: false,
                 lifetime: 0,
             };
             (GRID_WIDTH * GRID_HEIGHT) as usize
@@ -54,17 +54,62 @@ impl Grid {
         self.cells[y * self.width + x] = cell;
     }
 
-    pub fn in_bounds(&self, x: usize, y: usize) -> bool {
-        x < self.width && y < self.height
+    // Written explicetly for performance reasons, as this is called very often
+    pub fn swap(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) {
+        let temp = self.get(x1, y1);
+
+        self.set(
+            x1,
+            y1,
+            Cell {
+                material: self.get(x2, y2).material,
+                updated: true,
+                lifetime: 0,
+            },
+        );
+        self.set(
+            x2,
+            y2,
+            Cell {
+                material: temp.material,
+                updated: true,
+                lifetime: temp.lifetime,
+            },
+        );
     }
 
-    // Written exlicetly for performance reasons, as this is called very often
-    pub fn swap(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) {
-        let idx1 = y1 * self.width + x1;
-        let idx2 = y2 * self.width + x2;
-        let temp = self.cells[idx1];
-        self.cells[idx1] = self.cells[idx2];
-        self.cells[idx2] = temp;
+    fn clear_updated(&mut self) {
+        self.cells.iter_mut().for_each(|cell| {
+            if cell.updated {
+                cell.updated = false;
+            }
+        });
+    }
+
+    pub fn update(&mut self) {
+        self.clear_updated();
+
+        let mut left = false;
+
+        for y in (0..self.height).rev() {
+            if left {
+                for x in (0..self.width).rev() {
+                    let cell = self.get(x, y);
+                    if !cell.updated {
+                        rules::update(self, x, y);
+                    }
+                }
+                left = !left;
+            } else {
+                for x in 0..self.width {
+                    let cell = self.get(x, y);
+                    if !cell.updated {
+                        rules::update(self, x, y);
+                    }
+                }
+                left = !left;
+            }
+        }
     }
 }
 
@@ -75,7 +120,7 @@ impl Texturable for Grid {
             .iter()
             .flat_map(|cell| {
                 let color = match cell.material {
-                    Material::Air => [0, 0, 0, 0],
+                    Material::Air => [200, 200, 200, 255],
                     Material::Sand => [194, 178, 128, 255],
                     Material::Water => [64, 164, 223, 255],
                     Material::Stone => [128, 128, 128, 255],
