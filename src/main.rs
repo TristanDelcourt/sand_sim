@@ -3,8 +3,10 @@ mod grid;
 mod render;
 mod rules;
 
+use std::{thread, time::Duration};
+
 use crate::{
-    config::{CELL_SIZE, GRID_HEIGHT, GRID_WIDTH},
+    config::{CELL_SIZE, GRID_HEIGHT, GRID_WIDTH, TARGET_FPS},
     grid::{Grid, Material},
     render::Texturable,
 };
@@ -23,10 +25,13 @@ fn window_conf() -> Conf {
 async fn main() {
     let mut is_drawing = false;
     let mut drawing_material = Material::Sand;
+    let target_frame_time = 1. / TARGET_FPS as f64;
 
     let mut grid = Grid::new();
 
     loop {
+        let frame_start_time = get_time();
+
         if is_mouse_button_pressed(MouseButton::Left) {
             is_drawing = true;
         }
@@ -55,6 +60,15 @@ async fn main() {
 
         grid.draw();
         grid.update();
+
+        let fps_text = format!("{}", get_fps());
+        draw_text(&fps_text, 10.0, 25.0, 30.0, WHITE);
+
+        let frame_time = get_time() - frame_start_time;
+        if frame_time < target_frame_time {
+            let sleep_time = target_frame_time - frame_time;
+            thread::sleep(Duration::from_secs_f64(sleep_time));
+        }
 
         next_frame().await
     }

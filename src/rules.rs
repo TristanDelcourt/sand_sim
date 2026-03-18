@@ -10,9 +10,9 @@ fn density(material: Material) -> u8 {
         Material::Air => 0,
         Material::Smoke => 1,
         Material::Fire => 2,
-        Material::Wood => 3,
-        Material::Water => 4,
-        Material::Sand => 5,
+        Material::Water => 3,
+        Material::Sand => 4,
+        Material::Wood => 5,
         Material::Stone => 6,
     }
 }
