@@ -27,6 +27,8 @@ pub struct Grid {
     width: usize,
     height: usize,
     cells: Vec<Cell>,
+    texture: Texture2D,
+    texture_bytes: Vec<u8>,
 }
 
 impl Grid {
@@ -39,10 +41,32 @@ impl Grid {
             };
             (GRID_WIDTH * GRID_HEIGHT) as usize
         ];
+
+        let bytes = cells
+            .iter()
+            .flat_map(|cell| {
+                let color = match cell.material {
+                    Material::Air => [100, 100, 100, 255],
+                    Material::Sand => [194, 178, 128, 255],
+                    Material::Water => [64, 164, 223, 255],
+                    Material::Stone => [128, 128, 128, 255],
+                    Material::Wood => [139, 69, 19, 255],
+                    Material::Fire => [255, 69, 0, 255],
+                    Material::Smoke => [105, 105, 105, 128],
+                };
+                color
+            })
+            .collect::<Vec<u8>>();
+
+        let texture = Texture2D::from_rgba8(GRID_WIDTH as u16, GRID_HEIGHT as u16, &bytes);
+        texture.set_filter(macroquad::texture::FilterMode::Nearest);
+
         Self {
             width: GRID_WIDTH,
             height: GRID_HEIGHT,
             cells,
+            texture,
+            texture_bytes: bytes,
         }
     }
 
@@ -138,29 +162,31 @@ impl Grid {
 }
 
 impl Texturable for Grid {
-    fn draw(&self) {
-        let bytes = self
-            .cells
-            .iter()
-            .flat_map(|cell| {
-                let color = match cell.material {
-                    Material::Air => [100, 100, 100, 255],
-                    Material::Sand => [194, 178, 128, 255],
-                    Material::Water => [64, 164, 223, 255],
-                    Material::Stone => [128, 128, 128, 255],
-                    Material::Wood => [139, 69, 19, 255],
-                    Material::Fire => [255, 69, 0, 255],
-                    Material::Smoke => [105, 105, 105, 128],
-                };
-                color
-            })
-            .collect::<Vec<u8>>();
+    fn draw(&mut self) {
+        for (i, cell) in self.cells.iter().enumerate() {
+            let color = match cell.material {
+                Material::Air => [100, 100, 100, 255],
+                Material::Sand => [194, 178, 128, 255],
+                Material::Water => [64, 164, 223, 255],
+                Material::Stone => [128, 128, 128, 255],
+                Material::Wood => [139, 69, 19, 255],
+                Material::Fire => [255, 69, 0, 255],
+                Material::Smoke => [105, 105, 105, 128],
+            };
 
-        let texture = Texture2D::from_rgba8(self.width as u16, self.height as u16, &bytes);
-        texture.set_filter(macroquad::texture::FilterMode::Nearest);
+            // Each cell takes up 4 bytes (R, G, B, A)
+            let byte_idx = i * 4;
+            self.texture_bytes[byte_idx] = color[0];
+            self.texture_bytes[byte_idx + 1] = color[1];
+            self.texture_bytes[byte_idx + 2] = color[2];
+            self.texture_bytes[byte_idx + 3] = color[3];
+        }
+
+        self.texture
+            .update_from_bytes(GRID_WIDTH as u32, GRID_HEIGHT as u32, &self.texture_bytes);
 
         draw_texture_ex(
-            &texture,
+            &self.texture,
             0.,
             0.,
             WHITE,

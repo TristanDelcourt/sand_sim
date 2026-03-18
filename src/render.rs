@@ -1,3 +1,3 @@
 pub trait Texturable {
-    fn draw(&self);
+    fn draw(&mut self);
 }

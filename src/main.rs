@@ -23,15 +23,6 @@ fn window_conf() -> Conf {
 async fn main() {
     let mut is_drawing = false;
     let mut grid = Grid::new();
-    grid.set(
-        10,
-        10,
-        Cell {
-            material: Material::Sand,
-            updated: false,
-            lifetime: 0,
-        },
-    );
 
     loop {
         if is_mouse_button_pressed(MouseButton::Left) {
