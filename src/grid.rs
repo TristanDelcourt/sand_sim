@@ -120,7 +120,7 @@ impl Texturable for Grid {
             .iter()
             .flat_map(|cell| {
                 let color = match cell.material {
-                    Material::Air => [200, 200, 200, 255],
+                    Material::Air => [100, 100, 100, 255],
                     Material::Sand => [194, 178, 128, 255],
                     Material::Water => [64, 164, 223, 255],
                     Material::Stone => [128, 128, 128, 255],
