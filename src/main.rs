@@ -33,9 +33,6 @@ async fn main() {
         if is_mouse_button_released(MouseButton::Left) {
             is_drawing = false;
         }
-        if is_mouse_button_released(MouseButton::Left) {
-            is_drawing = false;
-        }
 
         while let Some(c) = get_char_pressed() {
             match c {

@@ -114,13 +114,13 @@ pub fn update(grid: &mut Grid, x: usize, y: usize) {
                 {
                     grid.swap(x, y, (x as isize + dx * direction) as usize, y);
                     return;
-                } else if grid.in_bounds(x as isize + dx * direction, y as isize)
+                } else if grid.in_bounds(x as isize - dx * direction, y as isize)
                     && can_displace(
                         grid.get(x, y).material,
-                        grid.get((x as isize + dx * direction) as usize, y).material,
+                        grid.get((x as isize - dx * direction) as usize, y).material,
                     )
                 {
-                    grid.swap(x, y, (x as isize + dx * direction) as usize, y);
+                    grid.swap(x, y, (x as isize - dx * direction) as usize, y);
                     return;
                 }
             }
