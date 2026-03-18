@@ -215,9 +215,12 @@ pub fn update(grid: &mut Grid, x: usize, y: usize) {
                 0
             };
             if grid.in_bounds(x as isize + dx, y as isize - 1)
-                && can_displace(grid.get(x, y).material, grid.get(x, y - 1).material)
+                && can_displace(
+                    grid.get(x, y).material,
+                    grid.get((x as isize + dx) as usize, y - 1).material,
+                )
             {
-                grid.swap((x as isize + dx) as usize, y, x, y - 1);
+                grid.swap(x, y, (x as isize + dx) as usize, y - 1);
                 return;
             }
 
