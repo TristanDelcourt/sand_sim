@@ -21,6 +21,7 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let mut is_drawing = false;
     let mut grid = Grid::new();
     grid.set(
         10,
@@ -33,6 +34,20 @@ async fn main() {
     );
 
     loop {
+        if is_mouse_button_pressed(MouseButton::Left) {
+            is_drawing = true;
+        }
+        if is_mouse_button_released(MouseButton::Left) {
+            is_drawing = false;
+        }
+
+        if is_drawing {
+            let (mouse_x, mouse_y) = mouse_position();
+            let grid_x = (mouse_x / CELL_SIZE as f32) as usize;
+            let grid_y = (mouse_y / CELL_SIZE as f32) as usize;
+            grid.paint(grid_x, grid_y, Material::Sand);
+        }
+
         grid.draw();
         grid.update();
 

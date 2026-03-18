@@ -41,16 +41,21 @@ pub fn update(grid: &mut Grid, x: usize, y: usize) {
             if x == GRID_WIDTH - 1
                 && can_displace(grid.get(x, y).material, grid.get(x - 1, y + 1).material)
             {
-                grid.swap(x, y, x + 1, y + 1);
+                grid.swap(x, y, x - 1, y + 1);
                 return;
             }
 
-            let dx = RandomRange::gen_range(-1, 2) as isize;
+            let dx = (RandomRange::gen_range(0, 2) * 2 - 1) as isize;
             if can_displace(
                 grid.get(x, y).material,
                 grid.get((x as isize + dx) as usize, y + 1).material,
             ) {
                 grid.swap(x, y, (x as isize + dx) as usize, y + 1);
+            } else if can_displace(
+                grid.get(x, y).material,
+                grid.get((x as isize - dx) as usize, y + 1).material,
+            ) {
+                grid.swap(x, y, (x as isize - dx) as usize, y + 1);
             }
         }
 

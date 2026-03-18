@@ -78,6 +78,10 @@ impl Grid {
         );
     }
 
+    pub fn in_bounds(&self, x: isize, y: isize) -> bool {
+        x < self.width as isize && y < self.height as isize && x >= 0 && y >= 0
+    }
+
     fn clear_updated(&mut self) {
         self.cells.iter_mut().for_each(|cell| {
             if cell.updated {
@@ -108,6 +112,26 @@ impl Grid {
                     }
                 }
                 left = !left;
+            }
+        }
+    }
+
+    pub fn paint(&mut self, x: usize, y: usize, material: Material) {
+        for dx in 0..DEFAULT_BRUSH_R {
+            for dy in 0..DEFAULT_BRUSH_R {
+                let offset_x = (dx as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
+                let offset_y = (dy as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
+                if self.in_bounds(x as isize + offset_x, y as isize + offset_y) {
+                    self.set(
+                        (x as isize + offset_x) as usize,
+                        (y as isize + offset_y) as usize,
+                        Cell {
+                            material,
+                            updated: false,
+                            lifetime: 0,
+                        },
+                    );
+                }
             }
         }
     }
