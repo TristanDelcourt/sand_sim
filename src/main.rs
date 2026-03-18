@@ -38,10 +38,10 @@ async fn main() {
             match c {
                 '&' | '1' => drawing_material = Material::Sand,
                 'é' | '2' => drawing_material = Material::Water,
-                //'"' | '3' => drawing_material = Material::Stone,
-                //'\'' | '4' => drawing_material = Material::Wood,
-                //'(' | '5' => drawing_material = Material::Fire,
-                //'-' | '6' => drawing_material = Material::Smoke,
+                '"' | '3' => drawing_material = Material::Stone,
+                '\'' | '4' => drawing_material = Material::Wood,
+                '(' | '5' => drawing_material = Material::Fire,
+                '-' | '6' => drawing_material = Material::Smoke,
                 _ => {} // Ignore any other keys
             }
         }

@@ -20,7 +20,7 @@ pub enum Material {
 pub struct Cell {
     pub material: Material,
     pub updated: bool,
-    pub lifetime: u8,
+    pub lifetime: u16,
 }
 
 pub struct Grid {
@@ -88,7 +88,7 @@ impl Grid {
             Cell {
                 material: self.get(x2, y2).material,
                 updated: true,
-                lifetime: 0,
+                lifetime: self.get(x2, y2).lifetime,
             },
         );
         self.set(
@@ -152,7 +152,7 @@ impl Grid {
                         Cell {
                             material,
                             updated: false,
-                            lifetime: 0,
+                            lifetime: if material == Material::Fire { 50 } else { 0 },
                         },
                     );
                 }
