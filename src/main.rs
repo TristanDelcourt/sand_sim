@@ -6,7 +6,7 @@ mod rules;
 use std::{thread, time::Duration};
 
 use crate::{
-    config::{CELL_SIZE, GRID_HEIGHT, GRID_WIDTH, TARGET_FPS},
+    config::{CELL_SIZE, DEFAULT_BRUSH_R, GRID_HEIGHT, GRID_WIDTH, TARGET_FPS},
     grid::{Grid, Material},
     render::Texturable,
 };
@@ -58,21 +58,22 @@ async fn main() {
         .text_color(Color::from_rgba(200, 200, 200, 255))
         .build();
 
-    // 2. Combine them into a new Skin
     let custom_skin = Skin {
         window_style,
         button_style,
         label_style,
-        ..root_ui().default_skin() // Inherit default settings for things we didn't customize (like checkboxes)
+        ..root_ui().default_skin()
     };
+
+    let ui_x = 10.;
+    let ui_y = 30.;
+    let ui_w = 82.;
+    let ui_h = 230.;
+
+    let mut brush_size = DEFAULT_BRUSH_R;
 
     loop {
         let frame_start_time = get_time();
-
-        let ui_x = 10.;
-        let ui_y = 30.;
-        let ui_w = 80.;
-        let ui_h = 190.;
 
         root_ui().push_skin(&custom_skin);
         root_ui().window(hash!(), vec2(ui_x, ui_y), vec2(ui_w, ui_h), |ui| {
@@ -93,6 +94,22 @@ async fn main() {
             }
             if ui.button(None, "Smoke") {
                 drawing_material = Material::Smoke;
+            }
+
+            // Brush size
+            ui.label(None, &format!("Size: {}", brush_size));
+
+            if ui.button(None, "-") {
+                if brush_size > 1 {
+                    brush_size -= 1;
+                }
+            }
+
+            ui.same_line(30.);
+            if ui.button(None, "+") {
+                if brush_size < 20 {
+                    brush_size += 1;
+                }
             }
         });
 
@@ -121,7 +138,7 @@ async fn main() {
         if is_drawing && !mouse_over_ui {
             let grid_x = (mouse_x / CELL_SIZE as f32) as usize;
             let grid_y = (mouse_y / CELL_SIZE as f32) as usize;
-            grid.paint(grid_x, grid_y, drawing_material);
+            grid.paint(grid_x, grid_y, drawing_material, brush_size);
         }
 
         grid.draw();

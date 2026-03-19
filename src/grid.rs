@@ -203,11 +203,11 @@ impl Grid {
         }
     }
 
-    pub fn paint(&mut self, x: usize, y: usize, material: Material) {
-        for dx in 0..DEFAULT_BRUSH_R {
-            for dy in 0..DEFAULT_BRUSH_R {
-                let offset_x = (dx as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
-                let offset_y = (dy as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
+    pub fn paint(&mut self, x: usize, y: usize, material: Material, brush_size: u8) {
+        for dx in 0..brush_size {
+            for dy in 0..brush_size {
+                let offset_x = (dx as isize - brush_size as isize / 2) as isize;
+                let offset_y = (dy as isize - brush_size as isize / 2) as isize;
                 let px = (x as isize + offset_x) as usize;
                 let py = (y as isize + offset_y) as usize;
                 if self.in_bounds(x as isize + offset_x, y as isize + offset_y) {
