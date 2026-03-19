@@ -64,9 +64,10 @@ async fn main() {
 
         grid.draw();
         grid.update();
+        grid.draw_stats();
 
         let fps_text = format!("{}", get_fps());
-        draw_text(&fps_text, 4., 15., 20., WHITE);
+        draw_text(&fps_text, 5., 15., 16., WHITE);
 
         let frame_time = get_time() - frame_start_time;
         if frame_time < target_frame_time {

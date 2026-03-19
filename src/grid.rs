@@ -2,6 +2,7 @@ use crate::{config::*, render::Texturable, rules};
 use macroquad::{
     color::WHITE,
     math::vec2,
+    text::draw_text,
     texture::{DrawTextureParams, Texture2D, draw_texture_ex},
 };
 
@@ -23,12 +24,27 @@ pub struct Cell {
     pub lifetime: u16,
 }
 
+struct Stats {
+    sand_count: usize,
+    water_count: usize,
+    stone_count: usize,
+    wood_count: usize,
+    fire_count: usize,
+    smoke_count: usize,
+}
+
+struct Config {
+    draw_counts: bool,
+}
+
 pub struct Grid {
     width: usize,
     height: usize,
     cells: Vec<Cell>,
     texture: Texture2D,
     texture_bytes: Vec<u8>,
+    stats: Stats,
+    config: Config,
 }
 
 impl Grid {
@@ -67,6 +83,15 @@ impl Grid {
             cells,
             texture,
             texture_bytes: bytes,
+            stats: Stats {
+                sand_count: 0,
+                water_count: 0,
+                stone_count: 0,
+                wood_count: 0,
+                fire_count: 0,
+                smoke_count: 0,
+            },
+            config: Config { draw_counts: true },
         }
     }
 
@@ -106,16 +131,52 @@ impl Grid {
         x < self.width as isize && y < self.height as isize && x >= 0 && y >= 0
     }
 
-    fn clear_updated(&mut self) {
+    fn clear(&mut self) {
         self.cells.iter_mut().for_each(|cell| {
             if cell.updated {
                 cell.updated = false;
             }
         });
+
+        self.stats = Stats {
+            sand_count: 0,
+            water_count: 0,
+            stone_count: 0,
+            wood_count: 0,
+            fire_count: 0,
+            smoke_count: 0,
+        };
+    }
+
+    fn increment_stats(&mut self, material: Material) {
+        match material {
+            Material::Sand => self.stats.sand_count += 1,
+            Material::Water => self.stats.water_count += 1,
+            Material::Stone => self.stats.stone_count += 1,
+            Material::Wood => self.stats.wood_count += 1,
+            Material::Fire => self.stats.fire_count += 1,
+            Material::Smoke => self.stats.smoke_count += 1,
+            Material::Air => {}
+        }
+    }
+
+    pub fn draw_stats(&self) {
+        if self.config.draw_counts {
+            let stats_text = format!(
+                "| Sand: {} | Water: {} | Stone: {} | Wood: {} | Fire: {} | Smoke: {}",
+                self.stats.sand_count,
+                self.stats.water_count,
+                self.stats.stone_count,
+                self.stats.wood_count,
+                self.stats.fire_count,
+                self.stats.smoke_count
+            );
+            draw_text(&stats_text, 30., 15., 16., WHITE);
+        }
     }
 
     pub fn update(&mut self) {
-        self.clear_updated();
+        self.clear();
 
         let mut left = false;
 
@@ -123,6 +184,7 @@ impl Grid {
             if left {
                 for x in (0..self.width).rev() {
                     let cell = self.get(x, y);
+                    self.increment_stats(cell.material);
                     if !cell.updated {
                         rules::update(self, x, y);
                     }
@@ -131,6 +193,7 @@ impl Grid {
             } else {
                 for x in 0..self.width {
                     let cell = self.get(x, y);
+                    self.increment_stats(cell.material);
                     if !cell.updated {
                         rules::update(self, x, y);
                     }
