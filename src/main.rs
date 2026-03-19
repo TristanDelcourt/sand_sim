@@ -17,6 +17,10 @@ fn window_conf() -> Conf {
         window_title: "Sand Simulation".to_owned(),
         window_width: (GRID_WIDTH * CELL_SIZE) as i32,
         window_height: (GRID_HEIGHT * CELL_SIZE) as i32,
+        platform: miniquad::conf::Platform {
+            swap_interval: Some(0),
+            ..Default::default()
+        },
         ..Default::default()
     }
 }
@@ -62,7 +66,7 @@ async fn main() {
         grid.update();
 
         let fps_text = format!("{}", get_fps());
-        draw_text(&fps_text, 10.0, 25.0, 30.0, WHITE);
+        draw_text(&fps_text, 4., 15., 20., WHITE);
 
         let frame_time = get_time() - frame_start_time;
         if frame_time < target_frame_time {

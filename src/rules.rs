@@ -33,15 +33,17 @@ pub fn update(grid: &mut Grid, x: usize, y: usize) {
                 return;
             }
 
-            if x == 0 && can_displace(grid.get(x, y).material, grid.get(x + 1, y + 1).material) {
-                grid.swap(x, y, x + 1, y + 1);
+            if x == 0 {
+                if can_displace(grid.get(x, y).material, grid.get(x + 1, y + 1).material) {
+                    grid.swap(x, y, x + 1, y + 1);
+                }
                 return;
             }
 
-            if x == GRID_WIDTH - 1
-                && can_displace(grid.get(x, y).material, grid.get(x - 1, y + 1).material)
-            {
-                grid.swap(x, y, x - 1, y + 1);
+            if x == GRID_WIDTH - 1 {
+                if can_displace(grid.get(x, y).material, grid.get(x - 1, y + 1).material) {
+                    grid.swap(x, y, x - 1, y + 1);
+                }
                 return;
             }
 
@@ -73,15 +75,17 @@ pub fn update(grid: &mut Grid, x: usize, y: usize) {
                 return;
             }
 
-            if x == 0 && can_displace(grid.get(x, y).material, grid.get(x + 1, y + 1).material) {
-                grid.swap(x, y, x + 1, y + 1);
+            if x == 0 {
+                if can_displace(grid.get(x, y).material, grid.get(x + 1, y + 1).material) {
+                    grid.swap(x, y, x + 1, y + 1);
+                }
                 return;
             }
 
-            if x == GRID_WIDTH - 1
-                && can_displace(grid.get(x, y).material, grid.get(x - 1, y + 1).material)
-            {
-                grid.swap(x, y, x - 1, y + 1);
+            if x == GRID_WIDTH - 1 {
+                if can_displace(grid.get(x, y).material, grid.get(x - 1, y + 1).material) {
+                    grid.swap(x, y, x - 1, y + 1);
+                }
                 return;
             }
 

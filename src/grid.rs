@@ -145,16 +145,20 @@ impl Grid {
             for dy in 0..DEFAULT_BRUSH_R {
                 let offset_x = (dx as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
                 let offset_y = (dy as isize - DEFAULT_BRUSH_R as isize / 2) as isize;
+                let px = (x as isize + offset_x) as usize;
+                let py = (y as isize + offset_y) as usize;
                 if self.in_bounds(x as isize + offset_x, y as isize + offset_y) {
-                    self.set(
-                        (x as isize + offset_x) as usize,
-                        (y as isize + offset_y) as usize,
-                        Cell {
-                            material,
-                            updated: false,
-                            lifetime: if material == Material::Fire { 50 } else { 0 },
-                        },
-                    );
+                    if self.get(px, py).material == Material::Air {
+                        self.set(
+                            px,
+                            py,
+                            Cell {
+                                material,
+                                updated: false,
+                                lifetime: if material == Material::Fire { 50 } else { 0 },
+                            },
+                        );
+                    }
                 }
             }
         }
